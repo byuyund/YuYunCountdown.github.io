@@ -6,29 +6,540 @@
     content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>倒计时</title>
+    
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/animate.css">
+    <link rel="stylesheet" href="css/jquery-ui.min.css"> 
+    
     <script src="js/jquery-1.12.4.min.js"></script>
+    <script src="js/jquery-ui.min.js"></script> 
+    
     <script src="js/timer.js"></script>
     <script type="text/javascript" src="https://api.lwl12.com/hitokoto/v1?encode=js&charset=utf-8"></script>
+    
     <style>
-        
+/* =================================================================
+ * 核心结构与通用样式 
+ * ================================================================= */
+
+body {
+    overflow-y: auto;
+    padding-bottom: 100px;
+    transition: background-image 0.5s ease; 
+}
+
+#clocks-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* 单个时钟卡片 */
+.clock-instance {
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 15px;
+    padding: 15px 20px;
+    margin-bottom: 25px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    
+    position: relative; 
+}
+
+/* =================================================================
+ * 倒计时时间单元样式 
+ * ================================================================= */
+
+.clock-instance .time-box ul {
+    display: flex; 
+    justify-content: center;
+    flex-wrap: nowrap;
+    padding: 0;
+    margin: 0 0 15px 0;
+}
+.clock-instance .time-box li {
+    list-style: none;
+    margin: 0 10px;
+    padding: 0;
+    text-align: center;
+    min-width: 50px;
+}
+.clock-instance .time-l { 
+    font-size: 36px;
+    font-weight: bold;
+    display: block;
+    color: #fff; 
+    line-height: 1.1;
+}
+.clock-instance .time-s {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+}
+.clock-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    padding: 2px 5px;
+    border-radius: 5px;
+    margin-right: 15px;
+    cursor: text; 
+    min-width: 50px;
+    outline: none;
+    user-select: text; 
+    -webkit-user-select: text;
+}
+
+/* =================================================================
+ * 头部和按钮 
+ * ================================================================= */
+
+.clock-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    cursor: grab;
+}
+.clock-header .clock-title {
+    cursor: text !important;
+}
+.clock-header .clock-title:focus {
+    cursor: text !important;
+}
+
+.settings-toggle-btn, .minimize-toggle-btn, .delete-clock-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    line-height: 30px;
+    text-align: center;
+    transition: all 0.2s;
+    font-weight: bold;
+    margin-left: 8px; 
+    flex-shrink: 0;
+}
+.settings-toggle-btn, .minimize-toggle-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 14px;
+}
+.settings-toggle-btn:hover, .minimize-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+.delete-clock-btn {
+    background: rgba(255, 0, 0, 0.5);
+    color: white;
+    font-size: 16px;
+}
+.delete-clock-btn:hover {
+    background: rgba(255, 0, 0, 0.8);
+}
+
+/* 设置区样式 */
+.clock-settings {
+    margin-bottom: 15px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.clock-settings label {
+    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+.clock-settings input[type="datetime-local"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-size: 14px;
+}
+.clock-settings input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+/* 标题颜色选择器组 */
+.title-color-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.title-color-group .color-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.title-color-group button {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+}
+.title-color-group button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+.title-color-group input[type="color"] {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+/* 进度条样式 */
+.progress-bar-container {
+    width: 100%;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.progress-bar-inner {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #4CAF50, #81C784); 
+    border-radius: 10px;
+    transition: width 0.5s ease-out;
+}
+.progress-percent-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-size: 12px;
+    font-weight: bold;
+    text-shadow: 0 0 3px rgba(0,0,0,0.5);
+}
+
+
+/* =================================================================
+ * FAB 容器和按钮样式 
+ * ================================================================= */
+
+#fab-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex; 
+    gap: 15px; 
+    align-items: flex-end;
+    z-index: 1000; 
+    flex-direction: row; 
+    justify-content: flex-end;
+}
+
+/* 通用 FAB 样式 - 确保球形 */
+.fab-button {
+    width: 60px; 
+    height: 60px; 
+    border-radius: 50%; /* 确保是圆形 */
+    
+    /* 居中内容 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1; 
+    
+    position: static; 
+    padding: 0;
+    color: white;
+    border: none;
+    font-size: 32px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+    /* 核心修改：统一过渡时间为 0.3s 和 ease-out 曲线 */
+    transition: all 0.3s ease-out, transform 0.3s ease-out; 
+}
+
+/* ★★★ 统一悬浮放大效果 (使用 ease-out) ★★★ */
+.fab-button:hover {
+    transform: scale(1.1) !important; 
+}
+
+/* 最小化后的时钟按钮样式 */
+.minimized-clock-btn {
+    /* 继承通用 FAB 尺寸和形状 */
+    width: 60px; 
+    height: 60px; 
+    border-radius: 50%; 
+    padding: 0;
+    
+    /* 确保内容垂直布局和外观 */
+    display: flex;
+    flex-direction: column; /* 标题和百分比垂直堆叠 */
+    align-items: center;
+    justify-content: center;
+    
+    background: rgba(0, 0, 0, 0.4); 
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3); 
+    /* 核心修改：统一过渡时间为 0.3s 和 ease-out 曲线 */
+    transition: all 0.3s ease-out, transform 0.3s ease-out;
+}
+
+/* 确保最小化按钮也有放大效果 */
+.minimized-clock-btn:hover {
+    transform: scale(1.1);
+}
+
+/* ★★★ 最小化标题省略号样式 ★★★ */
+.minimized-clock-btn .min-title {
+    font-size: 10px; 
+    max-width: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis; /* 核心：显示省略号 */
+    white-space: nowrap; /* 核心：强制不换行 */
+    margin-top: -5px; 
+}
+.minimized-clock-btn .min-percent {
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1.2;
+}
+
+
+/* 添加按钮样式 (最右边) */
+#add-clock-btn {
+    background: #4CAF50; 
+}
+#add-clock-btn span {
+    font-size: 32px;
+    margin: 0;
+}
+
+/* 壁纸切换按钮样式 (次右边) */
+#wallpaper-btn {
+    background: #007bff; 
+    font-size: 24px; 
+}
+
+/* 全局设置按钮样式 (次左边) */
+#settings-fab {
+    background: #FF5722; 
+    font-size: 24px;
+}
+
+/* =================================================================
+ * 全局设置菜单样式 
+ * ================================================================= */
+#global-settings-menu {
+    position: fixed;
+    bottom: 100px;
+    right: 30px;
+    width: 300px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    color: white;
+    display: none; 
+}
+
+#global-settings-menu h3 {
+    margin-top: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+#global-settings-menu .setting-group {
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+#global-settings-menu .setting-group:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+#global-settings-menu label {
+    display: block;
+    font-size: 14px;
+    margin-bottom: 8px;
+    font-weight: bold;
+}
+
+/* 确保输入组对齐 */
+#global-settings-menu select,
+#global-settings-menu .color-input-group {
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+#global-settings-menu select {
+    /* 修复：确保选择框样式 */
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 14px;
+    appearance: none; 
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M7 10l5 5 5-5z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    background-size: 16px;
+}
+/* 修复：确保颜色文本框占据剩余空间 */
+#global-settings-menu input[type="text"] {
+    flex-grow: 1;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    font-size: 14px;
+    text-transform: uppercase;
+}
+#global-settings-menu input[type="color"] {
+    margin-left: 10px;
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* 按钮组样式 */
+#global-settings-menu .wallpaper-controls {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+}
+#global-settings-menu .wallpaper-controls button {
+    flex-grow: 1;
+    background: #009688;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+#global-settings-menu .wallpaper-controls button:hover {
+    background: #00796b;
+}
+
+/* 隐藏文件输入框 */
+#local-wallpaper-input {
+    display: none;
+}
+
+/* =================================================================
+ * 完成状态样式 (计时完成描边和闪烁)
+ * ================================================================= */
+
+/* 闪烁动画定义 */
+@keyframes glow-blink {
+    0% {
+        box-shadow: 0 0 0px 0px rgba(229, 190, 17, 0.7), 0 0 10px 0px rgba(229, 190, 17, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 0px 0px rgba(229, 190, 17, 0.7), 0 0 15px 3px rgba(229, 190, 17, 1);
+    }
+    100% {
+        box-shadow: 0 0 0px 0px rgba(229, 190, 17, 0.7), 0 0 10px 0px rgba(229, 190, 17, 0.5);
+    }
+}
+
+/* 计时器卡片完成状态 */
+.clock-instance.completed {
+    /* 强力描边和闪烁效果 */
+    border: 1px solid #E5BE11;
+    animation: glow-blink 2s infinite ease-in-out; 
+}
+
+/* 最小化悬浮球完成状态 */
+.minimized-clock-btn.completed {
+    /* 使用跳动效果和金色描边 */
+    border: 3px solid #E5BE11 !important; /* 强制描边 */
+    animation: glow-blink 2s infinite ease-in-out; /* 闪烁动画 */
+}
+
     </style>
 </head>
 <body>
     <div id="container">
-        <div class="comson bounce animated">COMMING SOON</div>
-        <div class="time rubberBand animated">
-            <div class="time-box"><p>距离放假还有</p>
-                <ul class="clearfix">
-                    <li><span class="time-l" id="w">init</span><span class="time-s">周</span></li>
-                    <li><span class="time-l" id="d">init</span><span class="time-s">天</span></li>
-                    <li><span class="time-l" id="h">init</span><span class="time-s">时</span></li>
-                    <li><span class="time-l" id="m">init</span><span class="time-s">分</span></li>
-                    <li><span class="time-l" id="s">init</span><span class="time-s">秒</span></li>
-                </ul>
-                <span id="lwlhitokoto"><script>lwlhitokoto()</script></span>
+        <div id="clocks-container">
             </div>
+
+        <div id="global-settings-menu">
+            <h3>全局设置</h3>
+
+            <div class="setting-group">
+                <label for="fab-color-mode">悬浮球背景颜色模式:</label>
+                <select id="fab-color-mode">
+                    <option value="default">半透明黑色 (默认)</option>
+                    <option value="random">随机颜色</option>
+                    <option value="title">使用计时器标题颜色</option>
+                </select>
+            </div>
+
+            <div class="setting-group">
+                <label for="time-number-color">全局计时器数字颜色:</label>
+                <div class="color-input-group">
+                    <input type="text" id="time-number-color-text" value="#FFFFFF" readonly>
+                    <input type="color" id="time-number-color" value="#FFFFFF">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label for="progress-bar-color">全局进度条颜色:</label>
+                <div class="color-input-group">
+                    <input type="text" id="progress-bar-color-text" value="#4CAF50" readonly>
+                    <input type="color" id="progress-bar-color" value="#4CAF50">
+                </div>
+            </div>
+
+            <div class="setting-group">
+                <label>壁纸设置:</label>
+                <div class="wallpaper-controls">
+                    <button id="import-local-wallpaper-btn">导入本地图片</button>
+                    <button id="clear-local-wallpaper-btn" style="background: #D32F2F;">清除本地图片</button>
+                </div>
+                <input type="file" id="local-wallpaper-input" accept="image/*">
+            </div>
+
+        </div>
+
+        <div id="fab-container"> 
+            <button id="settings-fab" class="fab-button bounce animated" title="全局设置">
+                ⚙️
+            </button>
+            
+            <button id="wallpaper-btn" class="fab-button bounce animated" title="随机/本地壁纸切换" style="display: none;">
+                🖼️
+            </button>
+
+            <button id="add-clock-btn" class="fab-button bounce animated" title="添加新倒计时">
+                <span>+</span> 
+            </button>
         </div>
     </div>
 </body>
