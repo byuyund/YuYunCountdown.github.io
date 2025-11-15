@@ -2,3 +2,4 @@
 本人不会任何代码，由gemini网页全权完成感觉是屎山。（模型2.5flash和2.5pro，基底是https://github.com/meethigher/Countdown ）
 感觉ai已经把代码搅和的亲妈不认了。
 在线：https://byuyund.github.io/Countdown/ （试一下，俺没用过）
+AI太好玩了你知道吗（
