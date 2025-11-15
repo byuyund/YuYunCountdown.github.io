@@ -1,3 +1,4 @@
 在原代码基础上加入添加计时器，修改壁纸，拖动窗口，自定义取色，进度条，完成提示，自定义时钟颜色，修改名计时器称和颜色，最小化窗口等功能。
 本人不会任何代码，由gemini网页全权完成感觉是屎山。（模型2.5flash和2.5pro，基底是https://github.com/meethigher/Countdown ）
 感觉ai已经把代码搅和的亲妈不认了。
+在线：byuyund.github.io/Countdown/ （试一下，俺没用过）
