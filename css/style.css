@@ -1,0 +1,705 @@
+/* =================================================================
+ * 核心结构与通用样式 (从 index.html 提取)
+ * ================================================================= */
+
+body {
+    overflow-y: auto;
+    padding-bottom: 100px;
+    transition: background-image 0.5s ease; 
+}
+
+#clocks-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+/* 单个时钟卡片 */
+.clock-instance {
+    background: rgba(0, 0, 0, 0.45);
+    border-radius: 15px;
+    padding: 15px 20px;
+    margin-bottom: 25px;
+    width: 90%;
+    max-width: 600px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative; 
+}
+
+/* 关键修复：最小化卡片状态 */
+.clock-instance.minimized {
+    /* 彻底隐藏卡片，只通过 FAB 按钮交互 */
+    display: none !important; /* 确保它在流中消失 */
+}
+
+
+/* =================================================================
+ * 倒计时时间单元样式 (从 index.html 提取)
+ * ================================================================= */
+
+.clock-instance .time-box ul {
+    display: flex; 
+    justify-content: center;
+    flex-wrap: nowrap;
+    padding: 0;
+    margin: 0 0 15px 0;
+}
+.clock-instance .time-box li {
+    list-style: none;
+    margin: 0 10px;
+    padding: 0;
+    text-align: center;
+    min-width: 50px;
+}
+.clock-instance .time-l { 
+    font-size: 36px;
+    font-weight: bold;
+    display: block;
+    color: #fff; 
+    line-height: 1.1;
+}
+.clock-instance .time-s {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+}
+.clock-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    padding: 2px 5px;
+    border-radius: 5px;
+    margin-right: 15px;
+    cursor: text; 
+    min-width: 50px;
+    outline: none;
+    user-select: text; 
+    -webkit-user-select: text;
+}
+
+/* =================================================================
+ * 头部和按钮 (从 index.html 提取)
+ * ================================================================= */
+
+.clock-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 15px;
+    cursor: grab;
+}
+.clock-header .clock-title {
+    cursor: text !important;
+}
+.clock-header .clock-title:focus {
+    cursor: text !important;
+}
+
+.settings-toggle-btn, .minimize-toggle-btn, .delete-clock-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    line-height: 30px;
+    text-align: center;
+    transition: all 0.2s;
+    font-weight: bold;
+    margin-left: 8px; 
+    flex-shrink: 0;
+}
+.settings-toggle-btn, .minimize-toggle-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 15px;
+}
+.settings-toggle-btn:hover, .minimize-toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+.delete-clock-btn {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 16px;
+}
+.delete-clock-btn:hover {
+    background: rgba(255, 0, 0, 0.8);
+}
+
+/* 设置区样式 */
+.clock-settings {
+    margin-bottom: 15px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+.clock-settings label {
+    display: block;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 13px;
+    margin-bottom: 5px;
+}
+.clock-settings input[type="datetime-local"] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.3);
+    color: #fff;
+    font-size: 14px;
+}
+.clock-settings input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+}
+
+/* 标题颜色选择器组 */
+.title-color-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+}
+.title-color-group .color-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.title-color-group button {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 12px;
+}
+.title-color-group button:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+.title-color-group input[type="color"] {
+    width: 30px;
+    height: 30px;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+}
+
+/* 进度条样式 */
+.progress-bar-container {
+    width: 100%;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.progress-bar-inner {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #4CAF50, #81C784);
+    border-radius: 10px;
+    transition: width 0.5s ease-out;
+}
+.progress-percent-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 2;
+    text-shadow: 0 0 3px rgba(0, 0, 0, 0.5);
+}
+
+/* 进度条底部的日期提示 */
+.date-tips {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 5px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+/* =================================================================
+ * FAB 按钮组样式 
+ * ================================================================= */
+
+/* 最小化悬浮球容器 */
+#fab-container {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    /* 核心：横向排列，从右侧开始。新插入的元素会出现在最左侧（用户希望的位置）。 */
+    flex-direction: row-reverse; 
+    align-items: center; 
+    gap: 15px; /* 按钮间距 */
+    z-index: 1000;
+}
+.fab-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: none;
+    margin: 0; 
+    cursor: pointer;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.fab-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.5);
+}
+
+/* 最小化时钟按钮 (悬浮球) */
+.minimized-clock-btn {
+    width: 60px;
+    height: 60px;
+    line-height: 1.2;
+    text-align: center;
+    font-size: 12px; 
+    font-weight: bold;
+    padding: 5px;
+    box-sizing: border-box; 
+    
+    /* 修复默认主题色：半透明黑 */
+    background-color: rgba(0, 0, 0, 0.75); 
+    color: white;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+    border: none; 
+    
+    /* 确保内部内容垂直排列 */
+    display: flex; 
+    flex-direction: column; 
+    align-items: center;
+    justify-content: center;
+}
+
+/* 最小化按钮内部的标题和百分比 */
+.minimized-clock-btn .fab-title {
+    display: block;
+    width: 100%; 
+    overflow: hidden;
+    /* 修复：名字过长时自动省略 */
+    text-overflow: ellipsis; 
+    white-space: nowrap; /* 强制单行 */
+    line-height: 1.2;
+    font-size: 11px;
+    font-weight: normal;
+}
+.minimized-clock-btn .fab-percent {
+    display: block;
+    line-height: 1.2;
+    font-size: 14px;
+    font-weight: bold;
+    margin-top: 2px;
+}
+/* ... (样式文件底部省略) ... */
+.minimized-clock-btn.completed {
+    border: 2px solid #E5BE11; /* 琥珀色描边 */
+    animation: none;
+}
+
+/* BINGO 按钮样式 */
+#bingo-fab {
+    background: #FF9800; /* 橙色 */
+    font-size: 24px;
+}
+
+/* 添加按钮样式 (最右边) */
+#add-clock-btn {
+    background: #4CAF50;
+}
+#add-clock-btn span {
+    font-size: 32px;
+    margin: 0;
+}
+
+/* 全局设置按钮样式 (最左边) */
+#settings-fab {
+    background: #FF5722;
+    font-size: 24px;
+}
+
+/* ... (FAB 按钮组样式，如上一轮提供的保持不变) ... */
+
+/* =================================================================
+ * 全局设置/BINGO 设置面板样式 
+ * ================================================================= */
+
+/* 新增：定义设置面板的通用样式 */
+#global-settings-menu, #bingo-settings-menu {
+    position: fixed;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%; 
+    max-width: 500px;
+    background-color: rgba(44, 44, 44, 0.95); /* 深色半透明背景 */
+    border-radius: 0 0 10px 10px;
+    padding: 20px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    color: white;
+}
+
+#global-settings-menu h3, #bingo-settings-menu h3 {
+    text-align: center;
+    color: #4CAF50; /* 主题绿 */
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+.setting-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.setting-group label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    font-size: 14px;
+    color: #b0b0b0; /* 浅灰色文字 */
+}
+
+/* 统一输入框和选择框样式 */
+.setting-group input[type="text"], 
+.setting-group input[type="file"],
+.setting-group select,
+#bingo-settings-menu input[type="text"] {
+    padding: 8px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #333;
+    color: white;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* API Key 输入框和按钮组合 */
+.input-with-button {
+    display: flex;
+    gap: 10px;
+}
+
+.input-with-button input {
+    flex-grow: 1;
+}
+
+/* 按钮组样式 */
+.button-group {
+    display: flex;
+    gap: 10px;
+    justify-content: space-between;
+    margin-top: 5px;
+}
+
+.button-group button, .wallpaper-controls button {
+    flex-grow: 1;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s;
+}
+
+.wallpaper-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+/* =================================================================
+ * BINGO 专属样式 
+ * ================================================================= */
+
+#bingoBoard {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+    margin-top: 20px;
+    border: 2px solid #555;
+    border-radius: 8px;
+    padding: 5px;
+    background-color: #333;
+}
+
+.bingo-cell {
+    aspect-ratio: 1 / 1; /* 保持正方形 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 5px;
+    background-color: #555;
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    user-select: none;
+    line-height: 1.2;
+    overflow: hidden;
+}
+
+.bingo-cell:hover:not(.completed) {
+    background-color: #666;
+}
+
+.bingo-cell.completed {
+    background-color: #4CAF50; /* 绿色完成状态 */
+    color: #fff;
+    font-weight: bold;
+    text-decoration: line-through;
+    opacity: 0.85;
+}
+
+#bingoBoard.bingo-win .bingo-cell.completed {
+    background-color: #FFEB3B; /* 获胜时的高亮色 */
+    color: #333;
+    animation: flash 1s infinite alternate;
+}
+
+/* 状态消息样式 */
+#statusMessage {
+    padding: 10px;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: bold;
+    display: none;
+}
+
+#statusMessage.success {
+    background-color: #4CAF50; /* Green */
+    color: white;
+}
+
+#statusMessage.error {
+    background-color: #F44336; /* Red */
+    color: white;
+}
+
+#statusMessage.info {
+    background-color: #2196F3; /* Blue */
+    color: white;
+}
+
+/* 胜利动画 */
+@keyframes flash {
+    from {
+        box-shadow: 0 0 10px 0px rgba(255, 235, 59, 0.8);
+    }
+    to {
+        box-shadow: 0 0 20px 5px rgba(255, 235, 59, 1);
+    }
+}
+/* =================================================================
+ * 计时器卡片完成后的动画效果 (从 index.html 提取)
+ * ================================================================= */
+
+@keyframes glow-blink {
+    0%, 100% {
+        box-shadow: 0 0 10px 0px rgba(229, 190, 17, 0.7), 0 0 20px 0px rgba(229, 190, 17, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 5px 0px rgba(229, 190, 17, 1), 0 0 10px 0px rgba(229, 190, 17, 0.7);
+    }
+}
+
+/* 计时器卡片完成状态 */
+.clock-instance.completed {
+    /* 强力描边和闪烁效果 */
+    border: 1px solid #E5BE11;
+    animation: glow-blink 2s infinite ease-in-out;
+}
+
+/* =================================================================
+ * BINGO 模态框和内容样式 (保持不变)
+ * ================================================================= */
+
+/* 模态背景 */
+#bingo-modal {
+    position: fixed;
+    z-index: 1000; 
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto; 
+    background-color: rgba(0,0,0,0.8); 
+    display: none; 
+    backdrop-filter: blur(5px);
+}
+
+/* 模态内容容器 */
+#bingo-modal-content {
+    position: relative;
+    background-color: #fefefe;
+    margin: 5% auto; /* 顶部 5%，居中 */
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%; 
+    max-width: 800px;
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+#bingo-modal-content h1 {
+    color: #007bff;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* 关闭按钮 */
+.close-bingo-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.close-bingo-btn:hover,
+.close-bingo-btn:focus {
+    color: #000;
+    text-decoration: none;
+}
+
+/* API Key 和控制区域 */
+#bingo-modal-content .controls, 
+#bingo-modal-content .api-input {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+#bingo-modal-content .api-input input[type="text"], 
+#bingo-modal-content .controls input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+#bingo-modal-content .controls button,
+#bingo-modal-content .api-input button {
+    padding: 10px 15px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+
+#bingo-modal-content #generateBtn {
+    background-color: #28a745;
+    color: white;
+}
+#bingo-modal-content #generateBtn:hover {
+    background-color: #218838;
+}
+
+#bingo-modal-content #saveBtn, #bingo-modal-content #saveApiKeyBtn {
+    background-color: #007bff;
+    color: white;
+}
+#bingo-modal-content #saveBtn:hover, #bingo-modal-content #saveApiKeyBtn:hover {
+    background-color: #0056b3;
+}
+
+/* BINGO 板样式 */
+#bingo-modal-content #bingoBoard {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    border: 5px solid #007bff;
+    padding: 10px;
+    border-radius: 10px;
+    margin-top: 20px;
+}
+
+#bingo-modal-content .bingo-cell {
+    min-height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s, border-color 0.3s, transform 0.1s;
+    background-color: #fff;
+    user-select: none; 
+    -webkit-user-select: none;
+}
+
+#bingo-modal-content .bingo-cell:hover {
+    transform: scale(1.02);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* 完成状态 */
+#bingo-modal-content .bingo-cell.completed {
+    background-color: #28a745;
+    color: white;
+    border-color: #218838;
+    text-decoration: line-through;
+    opacity: 0.85;
+}
+
+/* 状态信息 */
+#bingo-modal-content #statusMessage {
+    margin-top: 15px;
+    padding: 10px;
+    border-radius: 5px;
+    text-align: center;
+    font-weight: bold;
+    display: none;
+}
+#bingo-modal-content .error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+#bingo-modal-content .success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+#bingo-modal-content .info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border: 1px solid #bee5eb;
+}
+
+/* BINGO 获胜动画 */
+@keyframes bingo-win-glow {
+    0%, 100% { box-shadow: 0 0 15px #ffc107; }
+    50% { box-shadow: 0 0 30px #ffc107, 0 0 40px #ffc107; }
+}
+
+#bingo-modal-content #bingoBoard.bingo-win {
+    animation: bingo-win-glow 1s infinite alternate;
+}
