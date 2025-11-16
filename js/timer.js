@@ -17,6 +17,15 @@ $(function() {
         settingsFabColor: generateRandomColor(),
         newClockDefaultTime: '7d' // 默认间隔 7 天
     };
+	// *** 新增：Gemini API Key 相关常量和变量 ***
+    const API_KEY_STORAGE_KEY = 'geminiApiKey';
+    let apiKey = localStorage.getItem(API_KEY_STORAGE_KEY);
+    
+    // *** 新增：API Key 相关的 DOM 元素 ***
+    const $apiKeyInput = $('#apiKeyInput');
+    const $saveApiKeyBtn = $('#saveApiKeyBtn');
+    
+    // ... (其他 timer.js 变量) ...
 
     function hexToRgb(hex) {
         // 专门处理 RGB 到 HEX 的转换，用于标题颜色
@@ -537,7 +546,28 @@ $(function() {
             saveClocksToStorage();
         });
     });
+	$saveApiKeyBtn.on('click', function() {
+        const key = $apiKeyInput.val().trim(); 
 
+        if (key) {
+            // 1. 保存到 localStorage
+            localStorage.setItem(API_KEY_STORAGE_KEY, key);
+            
+            // 2. 更新全局变量
+            // 注意：如果 bingo.js 需要使用这个 apiKey，它需要在自身文件内重新读取 localStorage
+            apiKey = key; 
+            
+            // 3. 提示用户 (假设您有一个 showMessage 函数，如果没有请使用 alert)
+            // 如果没有 showMessage，请使用 alert("Gemini API Key 已保存。");
+            showMessage('Gemini API Key 已保存。', 'success'); 
+        } else {
+            // 4. 清除 Key
+            localStorage.removeItem(API_KEY_STORAGE_KEY);
+            apiKey = null; 
+            showMessage('Gemini API Key 已清除。', 'info');
+            // 如果没有 showMessage，请使用 alert("Gemini API Key 已清除。");
+        }
+    });
     $clocksContainer.on('click', '.reset-title-color-btn', function() {
         const $title = $(this).closest('.clock-instance').find('.clock-title');
         $title.css('color', '#FFFFFF');
